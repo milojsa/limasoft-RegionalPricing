@@ -1,0 +1,40 @@
+{
+    "name": "limasoft/regional-pricing",
+    "description": "Postcode based pricing and service areas for Shopware 6",
+    "version": "1.0.0",
+    "type": "shopware-platform-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Limasoft"
+        }
+    ],
+    "require": {
+        "php": "~8.2",
+        "shopware/core": "~6.6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Limasoft\\RegionalPricing\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Limasoft\\RegionalPricing\\Test\\": "tests/"
+        }
+    },
+    "extra": {
+        "shopware-plugin-class": "Limasoft\\RegionalPricing\\LimasoftRegionalPricing",
+        "label": {
+            "en-GB": "Regional pricing by postcode",
+            "de-DE": "Regionale Preise nach Postleitzahl"
+        },
+        "description": {
+            "en-GB": "Resolves regional prices and service areas from the customer postcode.",
+            "de-DE": "Ermittelt regionale Preise und Liefergebiete anhand der Postleitzahl."
+        }
+    }
+}

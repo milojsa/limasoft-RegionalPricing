@@ -1,0 +1,42 @@
+{% block component_regional_pricing_gate %}
+    {% set zonePostcode = app.request.cookies.get('limasoft-postcode') %}
+
+    <div class="limasoft-postcode-gate" data-limasoft-postcode-gate>
+        <form action="{{ path('frontend.regional_pricing.postcode.save') }}"
+              method="post"
+              class="limasoft-postcode-gate-form">
+
+            <input type="hidden" name="redirectTo" value="{{ app.request.attributes.get('_route') }}">
+
+            <label class="limasoft-postcode-gate-label" for="limasoftPostcode">
+                {{ 'limasoft.regionalPricing.gate.label'|trans|sw_sanitize }}
+            </label>
+
+            <input type="text"
+                   class="form-control limasoft-postcode-gate-input"
+                   id="limasoftPostcode"
+                   name="postcode"
+                   value="{{ zonePostcode }}"
+                   inputmode="numeric"
+                   autocomplete="postal-code"
+                   maxlength="5"
+                   aria-describedby="limasoftPostcodeHelp"
+                   required="required">
+
+            <p class="limasoft-postcode-gate-help" id="limasoftPostcodeHelp">
+                {{ 'limasoft.regionalPricing.gate.help'|trans|sw_sanitize }}
+            </p>
+
+            <button type="submit" class="btn btn-primary limasoft-postcode-gate-submit">
+                {{ 'limasoft.regionalPricing.gate.submit'|trans|sw_sanitize }}
+            </button>
+        </form>
+
+        {# the result is announced, not only shown, so a screen reader hears the zone change #}
+        <div class="limasoft-postcode-gate-status" role="status" aria-live="polite">
+            {% if zonePostcode %}
+                {{ 'limasoft.regionalPricing.gate.active'|trans({'%postcode%': zonePostcode})|sw_sanitize }}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

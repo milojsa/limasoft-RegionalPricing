@@ -1,0 +1,17 @@
+{
+    "limasoft": {
+        "regionalPricing": {
+            "gate": {
+                "label": "Postleitzahl",
+                "help": "Wir zeigen Preise und Termine für Ihre Region.",
+                "submit": "Preise anzeigen",
+                "active": "Preise für Postleitzahl %postcode%.",
+                "invalid": "Bitte geben Sie eine gültige Postleitzahl ein.",
+                "notServiceable": "Diese Postleitzahl wird derzeit nicht bedient."
+            },
+            "cookie": {
+                "postcode": "Postleitzahl für regionale Preise"
+            }
+        }
+    }
+}

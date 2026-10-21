@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="Limasoft\RegionalPricing\Core\Content\PriceZone\PriceZoneDefinition">
+            <tag name="shopware.entity.definition"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Core\Content\PriceZone\PriceZonePostcodeDefinition">
+            <tag name="shopware.entity.definition"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Core\Rule\ZoneRule">
+            <tag name="shopware.rule.definition"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Service\PostcodeMatcher"/>
+
+        <service id="Limasoft\RegionalPricing\Service\PostcodeNormalizer"/>
+
+        <service id="Limasoft\RegionalPricing\Service\PostcodeProvider">
+            <argument type="service" id="request_stack"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Service\ZoneResolver">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeMatcher"/>
+            <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeNormalizer"/>
+            <argument type="service" id="cache.object"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Service\ZoneRuleSynchronizer">
+            <argument type="service" id="limasoft_price_zone.repository"/>
+            <argument type="service" id="rule.repository"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Core\System\SalesChannel\ZoneRuleContextFactory"
+                 decorates="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"
+                 decoration-priority="-100">
+            <argument type="service" id="Limasoft\RegionalPricing\Core\System\SalesChannel\ZoneRuleContextFactory.inner"/>
+            <argument type="service" id="Limasoft\RegionalPricing\Service\ZoneResolver"/>
+            <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeProvider"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Subscriber\ZoneCacheInvalidationSubscriber">
+            <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheInvalidator"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Subscriber\ZoneRuleSubscriber">
+            <argument type="service" id="limasoft_price_zone.repository"/>
+            <argument type="service" id="Limasoft\RegionalPricing\Service\ZoneRuleSynchronizer"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Storefront\Framework\Cookie\ZoneCookieProvider"
+                 decorates="Shopware\Storefront\Framework\Cookie\CookieProviderInterface">
+            <argument type="service" id="Limasoft\RegionalPricing\Storefront\Framework\Cookie\ZoneCookieProvider.inner"/>
+        </service>
+
+        <service id="Limasoft\RegionalPricing\Storefront\Controller\PostcodeGateController" public="true">
+            <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeNormalizer"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+    </services>
+</container>

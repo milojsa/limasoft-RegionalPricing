@@ -1,0 +1,17 @@
+{
+    "limasoft": {
+        "regionalPricing": {
+            "gate": {
+                "label": "Postcode",
+                "help": "We show prices and collection dates for your area.",
+                "submit": "Show prices",
+                "active": "Prices shown for postcode %postcode%.",
+                "invalid": "Please enter a valid postcode.",
+                "notServiceable": "We do not currently serve this postcode."
+            },
+            "cookie": {
+                "postcode": "Postcode for regional prices"
+            }
+        }
+    }
+}

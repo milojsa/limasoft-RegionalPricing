@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Regional pricing</title>
+        <title lang="de-DE">Regionale Preise</title>
+
+        <input-field type="single-select">
+            <name>priceVisibility</name>
+            <label>Where the regional price is shown</label>
+            <label lang="de-DE">Anzeige des regionalen Preises</label>
+            <defaultValue>everywhere</defaultValue>
+            <options>
+                <option>
+                    <id>everywhere</id>
+                    <name>Product and category pages, once a postcode is known</name>
+                    <name lang="de-DE">Produkt- und Kategorieseiten, sobald die Postleitzahl bekannt ist</name>
+                </option>
+                <option>
+                    <id>cart_only</id>
+                    <name>Cart and checkout only</name>
+                    <name lang="de-DE">Nur Warenkorb und Kasse</name>
+                </option>
+            </options>
+            <helpText>Decides whether a visitor sees a zone price while browsing or only after the cart.</helpText>
+        </input-field>
+
+        <input-field type="bool">
+            <name>showGateInHeader</name>
+            <label>Show the postcode field in the header</label>
+            <label lang="de-DE">Postleitzahl-Feld im Header anzeigen</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
+    </card>
+</config>
