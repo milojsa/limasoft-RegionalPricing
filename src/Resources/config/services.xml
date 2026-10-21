@@ -62,6 +62,11 @@
             <argument type="service" id="Limasoft\RegionalPricing\Storefront\Framework\Cookie\ZoneCookieProvider.inner"/>
         </service>
 
+        <service id="Limasoft\RegionalPricing\Command\CreateDemoZonesCommand">
+            <argument type="service" id="limasoft_price_zone.repository"/>
+            <tag name="console.command"/>
+        </service>
+
         <service id="Limasoft\RegionalPricing\Storefront\Controller\PostcodeGateController" public="true">
             <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeNormalizer"/>
             <call method="setContainer">
