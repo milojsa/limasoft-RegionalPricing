@@ -10,6 +10,11 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 // the zone is resolved once here and its rule id is pushed into the context.
 // shopware builds the http cache hash from the active rule ids, so two postcodes in
 // different zones get different hashes and cannot serve each other a cached price.
+//
+// this has to be the outermost decorator. CachedSalesChannelContextFactory caches the
+// context per sales channel and its key does not include the postcode, so injecting
+// inside that cache would store one visitor's zone and hand it to everybody else.
+// the decoration priority in services.xml is what keeps the order right.
 class ZoneRuleContextFactory extends AbstractSalesChannelContextFactory
 {
     public function __construct(

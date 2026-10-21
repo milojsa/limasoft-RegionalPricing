@@ -28,9 +28,24 @@ $context->setRuleIds(array_merge(
 ));
 ```
 
-The cache hash is already built from the active rule ids. Injecting the zone rule changes
-the hash, so two postcodes in different zones cannot serve each other a cached price. No
-custom cache key work is needed.
+The cache hash is already built from the active rule ids, in
+`CacheResponseSubscriber::buildCacheHash()`. Injecting the zone rule changes the hash, so
+two postcodes in different zones cannot serve each other a cached price. No custom cache
+key work is needed.
+
+Shopware can also fold named cookies into that hash. The postcode cookie is deliberately
+left out of it, because that would split the cache per postcode instead of per zone. A few
+zones means a few cache variants. Thousands of postcodes would mean thousands.
+
+### Decorator order matters
+
+`CachedSalesChannelContextFactory` caches the built context per sales channel, and its key
+does not contain the postcode. So the zone injection has to happen outside that cache, not
+inside it. Symfony applies the lowest `decoration-priority` last, which puts it outermost,
+so this plugin uses `-2000` against the core factory's `-1000`.
+
+Get this backwards and the first visitor's zone is cached and served to everyone. That is
+the same bug as putting the postcode in the context, one layer down.
 
 4. Excluded areas use the same mechanism. A postcode outside the service area resolves to a
    zone marked not serviceable, so availability needs no second system.
@@ -106,4 +121,5 @@ This is a working core, not a full regional pricing suite. Deliberately left out
 - Placement surcharges, lead times, service days and the holiday calendar follow the same
   custom entity pattern and are separate modules.
 - The admin module UI is not included yet. Zones are managed through the Admin API until it
-  lands.
+  lands. The zone condition itself renders in the rule builder already, through
+  `ZoneRule::getConfig()`, so no custom condition component is needed.

@@ -36,9 +36,11 @@
             <argument type="service" id="rule.repository"/>
         </service>
 
+        <!-- priority must stay below the -1000 of CachedSalesChannelContextFactory so this
+             decorator wraps the cache instead of running inside it -->
         <service id="Limasoft\RegionalPricing\Core\System\SalesChannel\ZoneRuleContextFactory"
                  decorates="Shopware\Core\System\SalesChannel\Context\SalesChannelContextFactory"
-                 decoration-priority="-100">
+                 decoration-priority="-2000">
             <argument type="service" id="Limasoft\RegionalPricing\Core\System\SalesChannel\ZoneRuleContextFactory.inner"/>
             <argument type="service" id="Limasoft\RegionalPricing\Service\ZoneResolver"/>
             <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeProvider"/>
