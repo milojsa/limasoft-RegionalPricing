@@ -2,6 +2,7 @@
 
 namespace Limasoft\RegionalPricing\Service;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class PostcodeProvider
@@ -21,10 +22,13 @@ class PostcodeProvider
 
         $request = $this->requestStack->getMainRequest();
 
-        if ($request === null) {
-            return null;
-        }
+        return $request === null ? null : $this->fromRequest($request);
+    }
 
+    // the http cache key is built before the request stack is useful, so that path reads
+    // the cookie off the request it is given
+    public function fromRequest(Request $request): ?string
+    {
         $postcode = $request->cookies->get(self::COOKIE_NAME);
 
         return is_string($postcode) && $postcode !== '' ? $postcode : null;

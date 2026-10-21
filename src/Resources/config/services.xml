@@ -46,6 +46,12 @@
             <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeProvider"/>
         </service>
 
+        <service id="Limasoft\RegionalPricing\Framework\Cache\ZoneCacheKeySubscriber">
+            <argument type="service" id="Limasoft\RegionalPricing\Service\ZoneResolver"/>
+            <argument type="service" id="Limasoft\RegionalPricing\Service\PostcodeProvider"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Limasoft\RegionalPricing\Subscriber\ZoneCacheInvalidationSubscriber">
             <argument type="service" id="Shopware\Core\Framework\Adapter\Cache\CacheInvalidator"/>
             <tag name="kernel.event_subscriber"/>

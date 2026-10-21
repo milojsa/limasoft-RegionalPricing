@@ -28,14 +28,35 @@ $context->setRuleIds(array_merge(
 ));
 ```
 
-The cache hash is already built from the active rule ids, in
-`CacheResponseSubscriber::buildCacheHash()`. Injecting the zone rule changes the hash, so
-two postcodes in different zones cannot serve each other a cached price. No custom cache
-key work is needed.
+Injecting the rule is what makes prices and availability correct. It is **not** enough to
+make the cache correct, and that distinction matters.
 
-Shopware can also fold named cookies into that hash. The postcode cookie is deliberately
-left out of it, because that would split the cache per postcode instead of per zone. A few
-zones means a few cache variants. Thousands of postcodes would mean thousands.
+`CacheResponseSubscriber::buildCacheHash()` does build the hash from the active rule ids,
+but it only writes the `sw-cache-hash` cookie that carries it when a customer is logged in
+or the cart has line items:
+
+```php
+if ($context->getCustomer() || $cart->getLineItems()->count() > 0) {
+```
+
+An anonymous visitor with an empty cart is exactly the case this plugin exists for, and for
+them the rule ids never reach the reverse proxy. `HttpCacheKeyGenerator::generate()` would
+build the same key for two guests in different zones, and one zone's prices would be served
+to the other.
+
+So the zone is added to the cache key directly, through the `HttpCacheKeyEvent` that
+`generate()` dispatches:
+
+```php
+$event->add('limasoft-zone', $zone?->zoneId ?? 'none');
+```
+
+The postcode itself is deliberately **not** used as the key part. A handful of zones means a
+handful of cache variants per page. Thousands of postcodes would mean thousands. Visitors
+with no postcode, and those outside every zone, share one variant.
+
+Both halves are needed. The rule injection gets the price right. The cache key part keeps
+one visitor's price away from another's.
 
 ### Decorator order matters
 
@@ -115,9 +136,16 @@ postcode in a different zone, and asserts neither carries the other's zone rule.
 the cookie path deliberately, because passing the postcode as a context option would land
 it in the context cache key and hide the very bug the test exists to catch.
 
-Verified on a real Shopware 6.6.10.29 install: three zones resolve to three distinct
-rules, each postcode yields only its own zone rule, unknown and malformed postcodes yield
-none, and the rule ids differ so the cache hashes differ.
+Verified on a real Shopware 6.6.10.29 install, at both layers. Context layer: three zones
+resolve to three distinct rules, each postcode yields only its own zone rule, and unknown
+or malformed postcodes yield none. HTTP layer: anonymous requests with an empty cart and no
+`sw-cache-hash` cookie produce a different cache key per zone, and share one key when no
+zone applies.
+
+Known limitation: the cache key part resolves the zone against the default country, because
+no sales channel context exists yet when the key is built. Single-country shops are
+unaffected. A multi-country shop that maps the same postcode to different zones per country
+would need the country folded into the key as well.
 
 ## Scope
 
