@@ -108,9 +108,16 @@ composer install
 vendor/bin/phpunit
 ```
 
-The suite covers postcode normalisation and zone matching, which is where the edge cases
-live. Cache separation between zones is verified in a Shopware integration environment, not
-here.
+The unit suite covers postcode normalisation and zone matching, which is where the edge
+cases live. `tests/Integration/ZoneCacheSeparationTest.php` covers the part that matters
+most: it warms the context cache with one postcode, then builds a context for a second
+postcode in a different zone, and asserts neither carries the other's zone rule. It uses
+the cookie path deliberately, because passing the postcode as a context option would land
+it in the context cache key and hide the very bug the test exists to catch.
+
+Verified on a real Shopware 6.6.10.29 install: three zones resolve to three distinct
+rules, each postcode yields only its own zone rule, unknown and malformed postcodes yield
+none, and the rule ids differ so the cache hashes differ.
 
 ## Scope
 
