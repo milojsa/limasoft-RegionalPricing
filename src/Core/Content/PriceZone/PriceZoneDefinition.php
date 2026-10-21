@@ -2,7 +2,7 @@
 
 namespace Limasoft\RegionalPricing\Core\Content\PriceZone;
 
-use Shopware\Core\Checkout\Cart\Rule\RuleDefinition;
+use Shopware\Core\Content\Rule\RuleDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
