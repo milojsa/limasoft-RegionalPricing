@@ -2,8 +2,11 @@
 
 namespace Limasoft\RegionalPricing\Command;
 
+use Limasoft\RegionalPricing\Core\Content\PriceZone\PriceZoneEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -49,10 +52,19 @@ class CreateDemoZonesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $context = Context::createDefaultContext();
 
+        $existing = $this->existingNames($context);
         $payload = [];
         $rows = [];
+        $skipped = [];
 
         foreach (self::ZONES as $zone) {
+            // running this twice must not duplicate the demo data
+            if (in_array($zone['name'], $existing, true)) {
+                $skipped[] = $zone['name'];
+
+                continue;
+            }
+
             $zoneId = Uuid::randomHex();
 
             $payload[] = [
@@ -76,11 +88,31 @@ class CreateDemoZonesCommand extends Command
             ];
         }
 
+        if ($skipped !== []) {
+            $io->note('Already present, left alone: ' . implode(', ', $skipped));
+        }
+
+        if ($payload === []) {
+            $io->success('Nothing to do, all demo zones exist.');
+
+            return self::SUCCESS;
+        }
+
         $this->zoneRepository->create($payload, $context);
 
         $io->table(['Zone', 'Priority', 'Serviceable', 'Postcodes'], $rows);
         $io->success('Created ' . \count($payload) . ' zones. Each one now has a rule to attach prices to.');
 
         return self::SUCCESS;
+    }
+
+    private function existingNames(Context $context): array
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter('name', array_column(self::ZONES, 'name')));
+
+        return $this->zoneRepository->search($criteria, $context)->getEntities()->map(
+            static fn (PriceZoneEntity $zone): string => $zone->getName()
+        );
     }
 }
